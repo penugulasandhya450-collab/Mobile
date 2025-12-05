@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Mobile Unlock Hub</title>
+    <style>
+        :root {
+            --primary-color: #00f2ea;
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-color: #e6edf3;
+            --hover-color: #1f2937;
+            --active-btn: #238636;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body { background-color: var(--bg-color); color: var(--text-color); padding: 20px; padding-bottom: 80px; }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        header { text-align: center; margin-bottom: 20px; }
+
+        h1 { color: var(--primary-color); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; font-size: 1.8rem; }
+
+        /* Search Bar */
+        .search-box {
+            width: 100%; padding: 15px; border-radius: 10px; border: 2px solid #30363d;
+            background: var(--card-bg); color: white; font-size: 1.1rem; outline: none; margin-bottom: 15px;
+        }
+        .search-box:focus { border-color: var(--primary-color); }
+
+        /* Filter Buttons (Categories) */
+        .categories {
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;
+            white-space: nowrap; -webkit-overflow-scrolling: touch;
+        }
+        .categories::-webkit-scrollbar { height: 4px; }
+        .categories::-webkit-scrollbar-thumb { background: #30363d; border-radius: 5px; }
+
+        .filter-btn {
+            padding: 8px 14px; border: 1px solid #30363d; background: var(--card-bg); color: #8b949e;
+            border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.85rem;
+        }
+        .filter-btn.active { background: var(--primary-color); color: black; font-weight: bold; border-color: var(--primary-color); }
+
+        /* List Styles */
+        .service-list { display: grid; gap: 10px; }
+
+        .card {
+            background: var(--card-bg); padding: 12px 15px; border-radius: 10px; border: 1px solid #30363d;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+            transition: 0.2s;
+        }
+        .card:active { transform: scale(0.98); background: var(--hover-color); }
+
+        .model-info h3 { font-size: 0.95rem; color: #fff; margin-bottom: 3px; }
+        .model-info p { font-size: 0.8rem; color: #8b949e; }
+        .price { font-size: 1rem; font-weight: bold; color: var(--primary-color); min-width: 60px; text-align: right; }
+
+        /* Floating Button */
+        .whatsapp-float {
+            position: fixed; bottom: 20px; right: 20px; background-color: #25D366; color: white;
+            width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-size: 28px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            text-decoration: none; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Unlock Rate Card</h1>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search Model (e.g., A50, Y21)...">
+            
+            <div class="categories">
+                <button class="filter-btn active" onclick="filterData('All')">All</button>
+                <button class="filter-btn" onclick="filterData('Samsung')">Samsung</button>
+                <button class="filter-btn" onclick="filterData('Realme')">Realme</button>
+                <button class="filter-btn" onclick="filterData('Vivo')">Vivo</button>
+                <button class="filter-btn" onclick="filterData('OPPO')">OPPO</button>
+                <button class="filter-btn" onclick="filterData('Xiaomi')">Redmi/Poco</button>
+                <button class="filter-btn" onclick="filterData('OnePlus')">OnePlus</button>
+                <button class="filter-btn" onclick="filterData('Motorola')">Moto</button>
+            </div>
+        </header>
+
+        <div id="listContainer" class="service-list">
+            </div>
+    </div>
+
+    <a href="https://wa.me/919505329034" class="whatsapp-float">💬</a>
+
+    <script>
+        const myNumber = "919505329034";
+        
+        // --- MASSIVE DATASET: 2018 to 2025 ---
+        const services = [
+            // --- SAMSUNG (A, M, F, S, Note Series) ---
+            { brand: "Samsung", model: "Galaxy J2 Core / J4 / J6 / J8", service: "FRP Unlock", price: 200 },
+            { brand: "Samsung", model: "Galaxy A10 / A10s", service: "FRP / Pattern", price: 250 },
+            { brand: "Samsung", model: "Galaxy A20 / A20s", service: "FRP Unlock", price: 250 },
+            { brand: "Samsung", model: "Galaxy A30 / A30s", service: "FRP Unlock", price: 250 },
+            { brand: "Samsung", model: "Galaxy A50 / A50s", service: "FRP Unlock", price: 300 },
+            { brand: "Samsung", model: "Galaxy A70 / A70s", service: "FRP Unlock", price: 300 },
+            { brand: "Samsung", model: "Galaxy A01 / A02 / A02s", service: "FRP Unlock", price: 250 },
+            { brand: "Samsung", model: "Galaxy A03 / A03s / A03 Core", service: "FRP Unlock", price: 300 },
+            { brand: "Samsung", model: "Galaxy A04 / A04s / A04e", service: "FRP Unlock", price: 350 },
+            { brand: "Samsung", model: "Galaxy A11 / A12 / A13", service: "FRP / Knox", price: 350 },
+            { brand: "Samsung", model: "Galaxy A14 4G / 5G", service: "FRP Unlock", price: 400 },
+            { brand: "Samsung", model: "Galaxy A15 5G", service: "FRP Unlock", price: 450 },
+            { brand: "Samsung", model: "Galaxy A21s / A22 / A23", service: "FRP Unlock", price: 350 },
+            { brand: "Samsung", model: "Galaxy A24 / A25", service: "FRP Unlock", price: 450 },
+            { brand: "Samsung", model: "Galaxy A31 / A32 / A33 / A34", service: "FRP Unlock", price: 400 },
+            { brand: "Samsung", model: "Galaxy A35 5G", service: "FRP Unlock", price: 500 },
+            { brand: "Samsung", model: "Galaxy A51 / A52 / A52s", service: "FRP Unlock", price: 400 },
+            { brand: "Samsung", model: "Galaxy A53 / A54 / A55", service: "FRP Unlock", price: 500 },
+            { brand: "Samsung", model: "Galaxy M01 / M01s / M02", service: "FRP Unlock", price: 250 },
+            { brand: "Samsung", model: "Galaxy M10 / M11 / M12", service: "FRP Unlock", price: 300 },
+            { brand: "Samsung", model: "Galaxy M13 / M14 / M15", service: "FRP Unlock", price: 400 },
+            { brand: "Samsung", model: "Galaxy M20 / M21 / M30 / M31", service: "FRP Unlock", price: 300 },
+            { brand: "Samsung", model: "Galaxy M32 / M33 / M34", service: "FRP Unlock", price: 400 },
+            { brand: "Samsung", model: "Galaxy M51 / M52 / M53", service: "FRP Unlock", price: 450 },
+            { brand: "Samsung", model: "Galaxy F04 / F12 / F13 / F14", service: "FRP Unlock", price: 350 },
+            { brand: "Samsung", model: "Galaxy F22 / F23 / F34", service: "FRP Unlock", price: 400 },
+            { brand: "Samsung", model: "Galaxy F41 / F42 / F54", service: "FRP Unlock", price: 450 },
+            { brand: "Samsung", model: "Galaxy S10 / S10+ / S10e", service: "FRP Unlock", price: 500 },
+            { brand: "Samsung", model: "Galaxy S20 / S20 FE / S21 FE", service: "FRP Unlock", price: 600 },
+            { brand: "Samsung", model: "Galaxy S21 / S22 / S23 / S24", service: "Server Unlock", price: 1200 },
+            { brand: "Samsung", model: "Galaxy Note 10 / Note 20 Ultra", service: "FRP Unlock", price: 800 },
+
+            // --- REALME (Number, C, Narzo, GT Series) ---
+            { brand: "Realme", model: "Realme 1", service: "Pattern / FRP", price: 200 },
+            { brand: "Realme", model: "Realme 2 / 2 Pro", service: "Unlock", price: 250 },
+            { brand: "Realme", model: "Realme 3 / 3 Pro / 3i", service: "Unlock", price: 250 },
+            { brand: "Realme", model: "Realme 5 / 5i / 5s / 5 Pro", service: "Unlock", price: 300 },
+            { brand: "Realme", model: "Realme 6 / 6i / 6 Pro", service: "Unlock", price: 350 },
+            { brand: "Realme", model: "Realme 7 / 7i / 7 Pro", service: "Unlock", price: 350 },
+            { brand: "Realme", model: "Realme 8 / 8i / 8s / 8 Pro", service: "Unlock", price: 400 },
+            { brand: "Realme", model: "Realme 9 / 9i / 9 Pro+", service: "Unlock", price: 450 },
+            { brand: "Realme", model: "Realme 10 / 10 Pro / 10 Pro+", service: "Unlock", price: 500 },
+            { brand: "Realme", model: "Realme 11 / 11x / 11 Pro", service: "Unlock", price: 600 },
+            { brand: "Realme", model: "Realme 12 / 12+ / 12 Pro", service: "Unlock", price: 700 },
+            { brand: "Realme", model: "Realme C1 / C2 / C3", service: "Unlock", price: 250 },
+            { brand: "Realme", model: "Realme C11 / C12 / C15", service: "Unlock", price: 300 },
+            { brand: "Realme", model: "Realme C20 / C21 / C25 / C25Y", service: "Unlock", price: 350 },
+            { brand: "Realme", model: "Realme C30 / C31 / C33 / C35", service: "Unlock", price: 400 },
+            { brand: "Realme", model: "Realme C51 / C53 / C55", service: "Unlock", price: 450 },
+            { brand: "Realme", model: "Realme C67 5G", service: "Unlock", price: 500 },
+            { brand: "Realme", model: "Narzo 10 / 20 / 30 / 50 Series", service: "Unlock", price: 350 },
+            { brand: "Realme", model: "Narzo 60 / N53 / N55", service: "Unlock", price: 450 },
+            { brand: "Realme", model: "Realme GT / GT 2 / GT Neo", service: "Unlock", price: 600 },
+
+            // --- VIVO (Y, V, T, X Series) ---
+            { brand: "Vivo", model: "Vivo Y91 / Y93 / Y95", service: "Unlock", price: 250 },
+            { brand: "Vivo", model: "Vivo Y11 / Y12 / Y15 / Y17", service: "Unlock", price: 300 },
+            { brand: "Vivo", model: "Vivo Y19 / Y20 / Y20G / Y20i", service: "Unlock", price: 350 },
+            { brand: "Vivo", model: "Vivo Y21 / Y21T / Y21e", service: "Unlock", price: 350 },
+            { brand: "Vivo", model: "Vivo Y22 / Y27 / Y28", service: "Unlock", price: 400 },
+            { brand: "Vivo", model: "Vivo Y30 / Y31 / Y33s / Y35", service: "Unlock", price: 350 },
+            { brand: "Vivo", model: "Vivo Y50 / Y51 / Y53s / Y56", service: "Unlock", price: 350 },
+            { brand: "Vivo", model: "Vivo Y71 / Y73 / Y75", service: "Unlock", price: 300 },
+            { brand: "Vivo", model: "Vivo Y100 / Y200", service: "Unlock", price: 500 },
+            { brand: "Vivo", model: "Vivo V15 / V15 Pro", service: "Unlock", price: 350 },
+            { brand: "Vivo", model: "Vivo V17 / V19 / V20", service: "Unlock", price: 400 },
+            { brand: "Vivo", model: "Vivo V21 / V23 / V25 / V27", service: "Unlock", price: 500 },
+            { brand: "Vivo", model: "Vivo V29 / V30", service: "Unlock", price: 600 },
+            { brand: "Vivo", model: "Vivo T1 / T2 / T3 Series", service: "Unlock", price: 450 },
+            { brand: "Vivo", model: "Vivo X50 / X60 / X70 / X80", service: "Unlock", price: 800 },
+
+            // --- OPPO (A, F, Reno, K Series) ---
+            { brand: "OPPO", model: "OPPO A1k / A3s / A5s", service: "Unlock", price: 250 },
+            { brand: "OPPO", model: "OPPO A9 / A12 / A15 / A15s", service: "Unlock", price: 300 },
+            { brand: "OPPO", model: "OPPO A16 / A17 / A18", service: "Unlock", price: 350 },
+            { brand: "OPPO", model: "OPPO A31 / A33 / A52 / A53", service: "Unlock", price: 350 },
+            { brand: "OPPO", model: "OPPO A54 / A55 / A57 / A58", service: "Unlock", price: 400 },
+            { brand: "OPPO", model: "OPPO A74 / A76 / A77 / A78", service: "Unlock", price: 450 },
+            { brand: "OPPO", model: "OPPO A96 / A98", service: "Unlock", price: 500 },
+            { brand: "OPPO", model: "OPPO F11 / F11 Pro", service: "Unlock", price: 350 },
+            { brand: "OPPO", model: "OPPO F15 / F17 / F17 Pro", service: "Unlock", price: 400 },
+            { brand: "OPPO", model: "OPPO F19 / F19 Pro / F21 Pro", service: "Unlock", price: 450 },
+            { brand: "OPPO", model: "OPPO F23 / F25 Pro", service: "Unlock", price: 500 },
+            { brand: "OPPO", model: "OPPO Reno 2 / 3 / 4 / 5", service: "Unlock", price: 500 },
+            { brand: "OPPO", model: "OPPO Reno 6 / 7 / 8 / 10 / 11", service: "Unlock", price: 600 },
+            { brand: "OPPO", model: "OPPO K10 / K12", service: "Unlock", price: 450 },
+
+            // --- XIAOMI / REDMI / POCO ---
+            { brand: "Xiaomi", model: "Redmi 6 / 6A / 7 / 7A", service: "Mi Account", price: 250 },
+            { brand: "Xiaomi", model: "Redmi 8 / 8A / 9 / 9A / 9i", service: "Mi Account", price: 300 },
+            { brand: "Xiaomi", model: "Redmi 10 / 10A / 10 Prime", service: "FRP / Mi Acc", price: 350 },
+            { brand: "Xiaomi", model: "Redmi 11 Prime / 12 / 13C", service: "FRP / Mi Acc", price: 400 },
+            { brand: "Xiaomi", model: "Redmi Note 5 / 6 Pro", service: "Mi Account", price: 250 },
+            { brand: "Xiaomi", model: "Redmi Note 7 / 7 Pro / 8", service: "Mi Account", price: 300 },
+            { brand: "Xiaomi", model: "Redmi Note 9 / 9 Pro / 9 Max", service: "Mi Account", price: 350 },
+            { brand: "Xiaomi", model: "Redmi Note 10 / 10S / 10 Pro", service: "Mi Account", price: 400 },
+            { brand: "Xiaomi", model: "Redmi Note 11 / 11T / 11 Pro", service: "Mi Account", price: 450 },
+            { brand: "Xiaomi", model: "Redmi Note 12 / 12 Pro", service: "Mi Account", price: 500 },
+            { brand: "Xiaomi", model: "Redmi Note 13 / 13 Pro+", service: "Mi Account", price: 600 },
+            { brand: "Xiaomi", model: "POCO C3 / C31 / C50 / C51 / C55", service: "FRP / Reset", price: 300 },
+            { brand: "Xiaomi", model: "POCO M2 / M3 / M4 / M5 / M6", service: "FRP / Mi Acc", price: 350 },
+            { brand: "Xiaomi", model: "POCO X2 / X3 / X4 / X5 / X6", service: "FRP / Mi Acc", price: 450 },
+            { brand: "Xiaomi", model: "POCO F1 / F3 / F4 / F5", service: "FRP / Mi Acc", price: 500 },
+
+            // --- ONEPLUS ---
+            { brand: "OnePlus", model: "OnePlus 3 / 3T / 5 / 5T", service: "Unlock", price: 300 },
+            { brand: "OnePlus", model: "OnePlus 6 / 6T / 7 / 7 Pro", service: "Unlock", price: 350 },
+            { brand: "OnePlus", model: "OnePlus 8 / 8T / 9 / 9R", service: "Unlock", price: 450 },
+            { brand: "OnePlus", model: "OnePlus 10R / 10 Pro / 11", service: "Unlock", price: 600 },
+            { brand: "OnePlus", model: "OnePlus Nord / CE / CE 2 / CE 3", service: "Unlock", price: 400 },
+            { brand: "OnePlus", model: "OnePlus Nord 2 / 2T / 3", service: "Unlock", price: 500 },
+
+            // --- MOTOROLA ---
+            { brand: "Motorola", model: "Moto G5 / G6 / G7 / G8", service: "FRP Unlock", price: 250 },
+            { brand: "Motorola", model: "Moto G9 / G10 / G30 / G40", service: "FRP Unlock", price: 300 },
+            { brand: "Motorola", model: "Moto G32 / G52 / G62 / G72", service: "FRP Unlock", price: 350 },
+            { brand: "Motorola", model: "Moto G54 / G84 5G", service: "FRP Unlock", price: 400 },
+            { brand: "Motorola", model: "Moto E-Series All", service: "FRP Unlock", price: 250 },
+            { brand: "Motorola", model: "Moto Edge 20 / 30 / 40", service: "FRP Unlock", price: 500 }
+        ];
+
+        const listContainer = document.getElementById('listContainer');
+        const searchInput = document.getElementById('searchInput');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+
+        // Function to Display Data
+        function renderList(items) {
+            listContainer.innerHTML = '';
+            if(items.length === 0) {
+                listContainer.innerHTML = '<div style="text-align:center; color:#8b949e; padding:20px;">No models found!</div>';
+                return;
+            }
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="model-info">
+                        <h3>${item.model}</h3>
+                        <p>${item.service}</p>
+                    </div>
+                    <div class="price">₹${item.price}</div>
+                `;
+                // Click to WhatsApp
+                card.addEventListener('click', () => {
+                    const msg = `Hello Mawa! I want to unlock *${item.model}* (${item.service}) - Price: ₹${item.price}. Is it available?`;
+                    const url = `https://wa.me/${myNumber}?text=${encodeURIComponent(msg)}`;
+                    window.open(url, '_blank');
+                });
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Initialize with All Data
+        renderList(services);
+
+        // Filter Function (Category Buttons)
+        function filterData(category) {
+            // Update Buttons UI
+            filterButtons.forEach(btn => {
+                if(btn.innerText.includes(category)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Filter Logic
+            if (category === 'All') {
+                renderList(services);
+            } else {
+                const filtered = services.filter(item => item.brand === category);
+                renderList(filtered);
+            }
+        }
+
+        // Search Function
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = services.filter(item => 
+                item.model.toLowerCase().includes(term) || 
+                item.brand.toLowerCase().includes(term)
+            );
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            filterButtons[0].classList.add('active');
+            renderList(filtered);
+        });
+    </script>
+</body>
+</html>
